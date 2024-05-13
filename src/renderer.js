@@ -7,6 +7,7 @@ import { Texture } from '@babylonjs/core/Materials/Textures/texture';
 import { RawTexture } from '@babylonjs/core/Materials/Textures/rawTexture';
 import { Color3, Color4 } from '@babylonjs/core/Maths/math.color';
 import { Vector2, Vector3 } from '@babylonjs/core/Maths/math.vector';
+import { CreateCylinder } from '@babylonjs/core';
 
 const BASE_URL = import.meta.env.BASE_URL || '/';
 
@@ -34,6 +35,17 @@ class Renderer {
                 ground_mesh: null,
                 camera: null,
                 ambient: new Color3(0.2, 0.2, 0.2),
+                lights: [],
+                models: []
+            },
+            { //scene 3
+                scene: new Scene(this.engine),
+                background_color: new Color4(0.75, 0.15, 0.05, 1.0),
+                materials: null,
+                ground_subdivisions: [50, 50],
+                ground_mesh: null,
+                camera: null,
+                ambient: new Color3(0.4, 0.4, 0.4),
                 lights: [],
                 models: []
             }
@@ -231,6 +243,175 @@ class Renderer {
         }
         box.material = materials['illum_' + this.shading_alg];
         current_scene.models.push(box);
+
+
+        // Animation function - called before each frame gets rendered
+        scene.onBeforeRenderObservable.add(() => {
+            // update models and lights here (if needed)
+            // ...
+
+            // update uniforms in shader programs
+            this.updateShaderUniforms(scene_idx, materials['illum_' + this.shading_alg]);
+            this.updateShaderUniforms(scene_idx, materials['ground_' + this.shading_alg]);
+        });
+    }
+    createScene2(scene_idx) {
+        let current_scene = this.scenes[scene_idx];
+        let scene = current_scene.scene;
+        let materials = current_scene.materials;
+        let ground_mesh = current_scene.ground_mesh;
+
+        // Set scene-wide / environment values
+        scene.clearColor = current_scene.background_color;
+        scene.ambientColor = current_scene.ambient;
+        scene.useRightHandedSystem = true;
+
+        // Create camera
+        current_scene.camera = new UniversalCamera('camera', new Vector3(48.0, 10.0, 1.0), scene);
+        current_scene.camera.setTarget(new Vector3(0.0, 1.8, 5.0));
+        current_scene.camera.upVector = new Vector3(0.0, 1.0, 0.0);
+        current_scene.camera.attachControl(this.canvas, true);
+        current_scene.camera.fov = 35.0 * (Math.PI / 180);
+        current_scene.camera.minZ = 0.1;
+        current_scene.camera.maxZ = 100.0;
+
+        // Create point light sources
+        let light0 = new PointLight('light0', new Vector3(1.0, 1.0, 5.0), scene);
+        light0.diffuse = new Color3(1.0, 0.3, 0.9);
+        light0.specular = new Color3(1.0, 1.0, 1.0);
+        current_scene.lights.push(light0);
+
+        let light1 = new PointLight('light1', new Vector3(30.0, 3.0, 0.0), scene);
+        light1.diffuse = new Color3(1.0, 0.3, 0.9);
+        light1.specular = new Color3(1.0, 1.0, 1.0);
+        current_scene.lights.push(light1);
+
+        // Create ground mesh
+        let white_texture = RawTexture.CreateRGBTexture(new Uint8Array([255, 255, 255]), 1, 1, scene);
+        let wood_texture = new Texture(BASE_URL + 'wood.jpg', scene);
+        let ground_heightmap = new Texture(BASE_URL + 'heightmaps/default.png', scene);
+        ground_mesh.scaling = new Vector3(100.0, 1.0, 20.0);
+        ground_mesh.metadata = {
+            mat_color: new Color3(0.83, 0.61, 0.40),
+            mat_texture: wood_texture,
+            mat_specular: new Color3(0.0, 0.0, 0.0),
+            mat_shininess: 7,
+            texture_scale: new Vector2(1.0, 1.0),
+            height_scalar: 0.1,
+            heightmap: ground_heightmap
+        }
+        ground_mesh.material = materials['ground_' + this.shading_alg];
+        
+        // Create other models
+        let ball = CreateSphere('sphere', {diameter: 4}, scene);
+        ball.position = new Vector3(25.0, 2.0, 0.0);
+        ball.metadata = {
+            mat_color: new Color3(0.1, 0.1, 0.1),
+            mat_texture: white_texture,
+            mat_specular: new Color3(0.8, 0.8, 0.8),
+            mat_shininess: 16,
+            texture_scale: new Vector2(1.0, 1.0)
+        }
+        ball.material = materials['illum_' + this.shading_alg];
+        current_scene.models.push(ball);
+
+        //creating the base for a bowling pin
+        let pinbase = CreateCylinder('pinbase', {diameter: 1, height: 5, diameterTop: 3}, scene);
+        pinbase.position = new Vector3(-20.0, 0.5, 2.0);
+        pinbase.metadata = {
+            mat_color: new Color3(0.95, 0.95, 0.95),
+            mat_texture: white_texture,
+            mat_specular: new Color3(0.4, 0.4, 0.4),
+            mat_shininess: 4,
+            texture_scale: new Vector2(1.0, 1.0)
+        };
+        pinbase.material = materials['illum_' + this.shading_alg];
+        current_scene.models.push(pinbase);
+
+        let pinmiddle = CreateCylinder('pinmiddle', {diameter: 3, height: 5, diameterTop: 1.0}, scene);
+        pinmiddle.position = new Vector3(-20.0, 5.5, 2.0);
+        pinmiddle.metadata = {
+            mat_color: new Color3(0.95, 0.95, 0.95),
+            mat_texture: white_texture,
+            mat_specular: new Color3(0.4, 0.4, 0.4),
+            mat_shininess: 4,
+            texture_scale: new Vector2(1.0, 1.0)
+        };
+        pinmiddle.material = materials['illum_' + this.shading_alg];
+        current_scene.models.push(pinmiddle);
+
+        let pinribbon = CreateCylinder('pinribbon', {diameter: 1.0, height: .5}, scene);
+        pinribbon.position = new Vector3(-20.0, 8.0, 2.0);
+        pinribbon.metadata = {
+            mat_color: new Color3(0.9, 0.1, 0.1),
+            mat_texture: white_texture,
+            mat_specular: new Color3(0.4, 0.4, 0.4),
+            mat_shininess: 4,
+            texture_scale: new Vector2(1.0, 1.0)
+        };
+        pinribbon.material = materials['illum_' + this.shading_alg];
+        current_scene.models.push(pinribbon);
+
+        let pintop = CreateCylinder('pintop', {radius:0.23, height:1.5, radiusTop:1}, scene);
+        pintop.position = new Vector3(-20.0, 9.0, 2.0);
+        pintop.metadata = {
+            mat_color: new Color3(0.95, 0.95, 0.95),
+            mat_texture: white_texture,
+            mat_specular: new Color3(0.4, 0.4, 0.4),
+            mat_shininess: 4,
+            texture_scale: new Vector2(1.0, 1.0)
+        };
+        pintop.material = materials['illum_' + this.shading_alg];
+        current_scene.models.push(pintop);
+
+        //creating the base for a bowling pin
+        let pinbase1 = CreateCylinder('pinbase1', {diameter: 1, height: 5, diameterTop: 3}, scene);
+        pinbase1.position = new Vector3(-25.0, 0.5, 5.0);
+        pinbase1.metadata = {
+            mat_color: new Color3(0.95, 0.95, 0.95),
+            mat_texture: white_texture,
+            mat_specular: new Color3(0.4, 0.4, 0.4),
+            mat_shininess: 4,
+            texture_scale: new Vector2(1.0, 1.0)
+        };
+        pinbase1.material = materials['illum_' + this.shading_alg];
+        current_scene.models.push(pinbase1);
+
+        let pinmiddle1 = CreateCylinder('pinmiddle1', {diameter: 3, height: 5, diameterTop: 1.0}, scene);
+        pinmiddle1.position = new Vector3(-25.0, 5.5, 5.0);
+        pinmiddle1.metadata = {
+            mat_color: new Color3(0.95, 0.95, 0.95),
+            mat_texture: white_texture,
+            mat_specular: new Color3(0.4, 0.4, 0.4),
+            mat_shininess: 4,
+            texture_scale: new Vector2(1.0, 1.0)
+        };
+        pinmiddle1.material = materials['illum_' + this.shading_alg];
+        current_scene.models.push(pinmiddle1);
+
+        let pinribbon1 = CreateCylinder('pinribbon1', {diameter: 1.0, height: .5}, scene);
+        pinribbon1.position = new Vector3(-25.0, 8.0, 5.0);
+        pinribbon1.metadata = {
+            mat_color: new Color3(0.9, 0.1, 0.1),
+            mat_texture: white_texture,
+            mat_specular: new Color3(0.4, 0.4, 0.4),
+            mat_shininess: 4,
+            texture_scale: new Vector2(1.0, 1.0)
+        };
+        pinribbon1.material = materials['illum_' + this.shading_alg];
+        current_scene.models.push(pinribbon1);
+
+        let pintop1 = CreateCylinder('pintop', {radius:0.23, height:1.5, radiusTop:1}, scene);
+        pintop1.position = new Vector3(-25.0, 9.0, 5.0);
+        pintop1.metadata = {
+            mat_color: new Color3(0.95, 0.95, 0.95),
+            mat_texture: white_texture,
+            mat_specular: new Color3(0.4, 0.4, 0.4),
+            mat_shininess: 4,
+            texture_scale: new Vector2(1.0, 1.0)
+        };
+        pintop1.material = materials['illum_' + this.shading_alg];
+        current_scene.models.push(pintop1);
 
 
         // Animation function - called before each frame gets rendered
