@@ -91,18 +91,25 @@ class Renderer {
         current_scene.camera.minZ = 0.1;
         current_scene.camera.maxZ = 100.0;
 
-        // Create point light sources
+        // Create point light sources LIGHT POINT SRC 0
         let light0 = new PointLight('light0', new Vector3(1.0, 1.0, 5.0), scene);
         light0.diffuse = new Color3(1.0, 1.0, 1.0);
         light0.specular = new Color3(1.0, 1.0, 1.0);
         current_scene.lights.push(light0);
 
+        // Create point light sources LIGHT POINT SRC 1
         let light1 = new PointLight('light1', new Vector3(0.0, 3.0, 0.0), scene);
-        light1.diffuse = new Color3(1.0, 1.0, 1.0);
-        light1.specular = new Color3(1.0, 1.0, 1.0);
+        light1.diffuse = new Color3(0.1, 0.1, 0.1);
+        light1.specular = new Color3(0.1, 0.1, 0.1);
         current_scene.lights.push(light1);
-
-        // Create ground mesh
+       
+        // Create point light sources LIGHT POINT SRC 2
+        let light2 = new PointLight('light1', new Vector3(0.0, 3.0, 0.0), scene);
+        light2.diffuse = new Color3(0.5, 0.5, 0.5);
+        light2.specular = new Color3(0.5, 0.5, 0.5);
+        current_scene.lights.push(light2);
+    
+       // Create ground mesh
         let white_texture = RawTexture.CreateRGBTexture(new Uint8Array([255, 255, 255]), 1, 1, scene);
         let ground_heightmap = new Texture(BASE_URL + 'heightmaps/default.png', scene);
         ground_mesh.scaling = new Vector3(20.0, 1.0, 20.0);
