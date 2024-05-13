@@ -25,12 +25,45 @@ class Renderer {
                 ambient: new Color3(0.2, 0.2, 0.2),
                 lights: [],
                 models: []
+            },
+            { //scene 2
+                scene: new Scene(this.engine),
+                background_color: new Color4(0.0, 1.0, 1.0, 1.0),
+                materials: null,
+                ground_subdivisions: [50, 50],
+                ground_mesh: null,
+                camera: null,
+                ambient: new Color3(0.2, 0.2, 0.2),
+                lights: [],
+                models: []
             }
         ];
         this.active_scene = 0;
         this.active_light = 0;
         this.shading_alg = 'gouraud';
-
+        //using the keys to change the position of the lighting
+        window.addEventListener("keypress", a => {
+            //a : translate -x
+            if (String.fromCharCode(a.keyCode) === 'a') {
+                this.scenes[this.active_scene].lights[this.active_light].position.x -= 1;
+            //d : translate +x
+            } else if (String.fromCharCode(a.keyCode) === 'd') {
+                this.scenes[this.active_scene].lights[this.active_light].position.x += 1;
+            //f : translate -y
+            } else if (String.fromCharCode(a.keyCode) === 'f') {
+                this.scenes[this.active_scene].lights[this.active_light].position.y -= 1;
+            //r : translate +y
+            } else if (String.fromCharCode(a.keyCode) === 'r') {
+                this.scenes[this.active_scene].lights[this.active_light].position.y += 1;
+            //w: translate -z
+            } else if (String.fromCharCode(a.keyCode) === 'w') {
+                this.scenes[this.active_scene].lights[this.active_light].position.z -= 1;
+            //s: translate +z
+            } else if (String.fromCharCode(a.keyCode) === 's') {
+                this.scenes[this.active_scene].lights[this.active_light].position.z += 1;
+            }
+            console.log(this.scenes[this.active_scene].lights[this.active_light].position);
+        });
         this.scenes.forEach((scene, idx) => {
             scene.materials = material_callback(scene.scene);
             scene.ground_mesh = ground_mesh_callback(scene.scene, scene.ground_subdivisions);
