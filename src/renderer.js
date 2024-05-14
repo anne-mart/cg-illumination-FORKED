@@ -29,7 +29,7 @@ class Renderer {
             },
             { //scene 2
                 scene: new Scene(this.engine),
-                background_color: new Color4(0.0, 1.0, 1.0, 1.0),
+                background_color: new Color4(0.13, .10, 0.29, 1.0),
                 materials: null,
                 ground_subdivisions: [50, 50],
                 ground_mesh: null,
@@ -215,13 +215,34 @@ class Renderer {
         light1.specular = new Color3(1.0, 1.0, 1.0);
         current_scene.lights.push(light1);
 
+        let light2 = new PointLight('light2', new Vector3(-10.0, 2.0, -25.0), scene);
+        light2.diffuse = new Color3(1.0, 0.5, 1.0);
+        light2.specular = new Color3(1.0, 0.5, 1.0);
+        current_scene.lights.push(light2);
+
+        let light3 = new PointLight('light3', new Vector3(5.0, 3.0, 20.0), scene);
+        light3.diffuse = new Color3(1.0, 1.0, 0.4);
+        light3.specular = new Color3(1.0, 1.0, 0.4);
+        current_scene.lights.push(light3);
+
+        let light4 = new PointLight('light4', new Vector3(-4.0, 1.0, 15.0), scene);
+        light4.diffuse = new Color3(1.0, 1.0, 1.0);
+        light4.specular = new Color3(1.0, 1.0, 1.0);
+        current_scene.lights.push(light4);
+
+        let light5 = new PointLight('light5', new Vector3(12.0, 2.5, -35.0), scene);
+        light5.diffuse = new Color3(1.0, 1.0, 1.0);
+        light5.specular = new Color3(1.0, 1.0, 1.0);
+        current_scene.lights.push(light5);
+
         // Create ground mesh
         let white_texture = RawTexture.CreateRGBTexture(new Uint8Array([255, 255, 255]), 1, 1, scene);
-        let ground_heightmap = new Texture(BASE_URL + 'heightmaps/testing.jpg', scene);
-        ground_mesh.scaling = new Vector3(200.0, 1.0, 200.0);
+        let ground_heightmap = new Texture(BASE_URL + 'heightmaps/testing2.jpg', scene);
+        let rocky_texture = new Texture(BASE_URL + 'rocky.jpg', scene);
+        ground_mesh.scaling = new Vector3(50.0, 1.0, 50.0);
         ground_mesh.metadata = {
-            mat_color: new Color3(0.10, 0.65, 0.15),
-            mat_texture: white_texture,
+            mat_color: new Color3(1.0, 1.0, 1.0),
+            mat_texture: rocky_texture,
             mat_specular: new Color3(0.0, 0.0, 0.0),
             mat_shininess: 1,
             texture_scale: new Vector2(1.0, 1.0),
@@ -232,8 +253,8 @@ class Renderer {
         
         // Create other models
         let sphere = CreateSphere('sphere', {segments: 32}, scene);
-        let cloud_texture = new Texture(BASE_URL + 'cloud.jpg', scene);
-        sphere.position = new Vector3(2.0, 4.3, 2.0);
+        let cloud_texture = new Texture(BASE_URL + 'earth.jpeg', scene);
+        sphere.position = new Vector3(2.0, 3.0, -70.0);
         sphere.metadata = {
             mat_color: new Color3(0.97, 0.97, 0.97),
             mat_texture: cloud_texture,
@@ -243,18 +264,6 @@ class Renderer {
         }
         sphere.material = materials['illum_' + this.shading_alg];
         current_scene.models.push(sphere);
-
-        let box = CreateBox('box', {width: 2, height: 1, depth: 1}, scene);
-        box.position = new Vector3(-1.0, 0.5, 2.0);
-        box.metadata = {
-            mat_color: new Color3(0.75, 0.15, 0.05),
-            mat_texture: white_texture,
-            mat_specular: new Color3(0.4, 0.4, 0.4),
-            mat_shininess: 4,
-            texture_scale: new Vector2(1.0, 1.0)
-        }
-        box.material = materials['illum_' + this.shading_alg];
-        current_scene.models.push(box);
 
 
         // Animation function - called before each frame gets rendered
@@ -310,7 +319,7 @@ class Renderer {
             mat_shininess: 7,
             texture_scale: new Vector2(1.0, 1.0),
             height_scalar: 0.1,
-            heightmap: ground_heightmap
+            //heightmap: ground_heightmap
         }
         ground_mesh.material = materials['ground_' + this.shading_alg];
         
