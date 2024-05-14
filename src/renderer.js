@@ -196,7 +196,7 @@ class Renderer {
         scene.useRightHandedSystem = true;
 
         // Create camera
-        current_scene.camera = new UniversalCamera('camera', new Vector3(0.0, 1.8, 10.0), scene);
+        current_scene.camera = new UniversalCamera('camera', new Vector3(0.0, 3.8, 10.0), scene);
         current_scene.camera.setTarget(new Vector3(0.0, 1.8, 0.0));
         current_scene.camera.upVector = new Vector3(0.0, 1.0, 0.0);
         current_scene.camera.attachControl(this.canvas, true);
@@ -217,8 +217,8 @@ class Renderer {
 
         // Create ground mesh
         let white_texture = RawTexture.CreateRGBTexture(new Uint8Array([255, 255, 255]), 1, 1, scene);
-        let ground_heightmap = new Texture(BASE_URL + 'heightmaps/default.png', scene);
-        ground_mesh.scaling = new Vector3(20.0, 1.0, 20.0);
+        let ground_heightmap = new Texture(BASE_URL + 'heightmaps/testing.jpg', scene);
+        ground_mesh.scaling = new Vector3(200.0, 1.0, 200.0);
         ground_mesh.metadata = {
             mat_color: new Color3(0.10, 0.65, 0.15),
             mat_texture: white_texture,
@@ -232,10 +232,11 @@ class Renderer {
         
         // Create other models
         let sphere = CreateSphere('sphere', {segments: 32}, scene);
-        sphere.position = new Vector3(2.0, 0.3, 2.0);
+        let cloud_texture = new Texture(BASE_URL + 'cloud.jpg', scene);
+        sphere.position = new Vector3(2.0, 4.3, 2.0);
         sphere.metadata = {
             mat_color: new Color3(0.97, 0.97, 0.97),
-            mat_texture: white_texture,
+            mat_texture: cloud_texture,
             mat_specular: new Color3(0.8, 0.8, 0.8),
             mat_shininess: 16,
             texture_scale: new Vector2(1.0, 1.0)
@@ -478,7 +479,7 @@ class Renderer {
         // Create ground mesh
         let white_texture = RawTexture.CreateRGBTexture(new Uint8Array([255, 255, 255]), 1, 1, scene);
         let ground_heightmap = new Texture(BASE_URL + 'heightmaps/default.png', scene);
-        ground_mesh.scaling = new Vector3(20.0, 1.0, 20.0);
+        ground_mesh.scaling = new Vector3(100.0, 1.0, 100.0);
         ground_mesh.metadata = {
             mat_color: new Color3(0.90, 0.95, 0.80),
             mat_texture: white_texture,
@@ -580,7 +581,7 @@ class Renderer {
                     mat_color: new Color3(0.34, 0.97, 0.34),
                     mat_texture: wood_texture,
                     mat_specular: new Color3(0.8, 0.8, 0.8),
-                    mat_shininess: 16,
+                    mat_shininess: 10,
                     texture_scale: new Vector2(1.0, 1.0)
                 }
                 treeMesh.material = materials['illum_' + this.shading_alg];
@@ -626,6 +627,44 @@ class Renderer {
         }
         present2.material = materials['illum_' + this.shading_alg];
         current_scene.models.push(present2);
+
+        let tree1 = treeMesh.clone("tree1");
+        let tree2 = treeMesh.clone("tree2");
+        let tree3 = treeMesh.clone("tree3");
+        let tree4 = treeMesh.clone("tree4");
+
+        tree1.scaling.x = 0.5; // Scale instance1 by 1.5 on all axes
+        tree1.scaling.y = 0.5;
+        tree1.scaling.z = 0.5;
+
+        tree1.position.x = 8.5;
+
+        tree2.scaling.x = 0.5; // Scale instance1 by 1.5 on all axes
+        tree2.scaling.y = 0.25;
+        tree2.scaling.z = 0.5;
+
+        tree2.position.x = 6.5;
+        tree2.position.z = 2.5;
+
+        tree3.scaling.x = 0.5; // Scale instance1 by 1.5 on all axes
+        tree3.scaling.y = 0.75;
+        tree3.scaling.z = 0.5;
+
+        tree3.position.x = -6.5;
+        tree3.position.z = 2.5;
+
+        tree4.scaling.x = 0.45; // Scale instance1 by 1.5 on all axes
+        tree4.scaling.y = 0.25;
+        tree4.scaling.z = 0.5;
+
+        tree4.position.x = -10.5;
+        tree4.position.z = 6.5;
+
+        scene.addMesh(tree1);
+        scene.addMesh(tree2);
+        scene.addMesh(tree3);
+        scene.addMesh(tree4);
+
 
         let world = CreateBox("world", {width: 50, height: 50, depth: 50}, scene)
         world.position = new Vector3(-2.0, 0.5, 5.0);
