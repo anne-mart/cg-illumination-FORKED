@@ -7,7 +7,7 @@ import { Texture } from '@babylonjs/core/Materials/Textures/texture';
 import { RawTexture } from '@babylonjs/core/Materials/Textures/rawTexture';
 import { Color3, Color4 } from '@babylonjs/core/Maths/math.color';
 import { Vector2, Vector3 } from '@babylonjs/core/Maths/math.vector';
-import { CreateCylinder, VertexData } from '@babylonjs/core';
+import { CreateCylinder, Mesh, VertexData } from '@babylonjs/core';
 
 const BASE_URL = import.meta.env.BASE_URL || '/';
 
@@ -458,15 +458,20 @@ class Renderer {
         current_scene.camera.maxZ = 100.0;
 
         // Create point light sources
-        let light0 = new PointLight('light0', new Vector3(1.0, 1.0, 5.0), scene);
-        light0.diffuse = new Color3(1.0, 1.0, 1.0);
-        light0.specular = new Color3(1.0, 1.0, 1.0);
+        let light0 = new PointLight('light0', new Vector3(4.0, 1.0, 8.0), scene);
+        light0.diffuse = new Color3(1.0, 0.5, 0.5);
+        light0.specular = new Color3(1.0, 0.5, 0.5);
         current_scene.lights.push(light0);
 
-        let light1 = new PointLight('light1', new Vector3(0.0, 3.0, 0.0), scene);
-        light1.diffuse = new Color3(1.0, 1.0, 1.0);
+        let light1 = new PointLight('light1', new Vector3(-2.5, 3.0, 4.5), scene);
+        light1.diffuse = new Color3(0.2, 0.2, 1.0);
         light1.specular = new Color3(1.0, 1.0, 1.0);
         current_scene.lights.push(light1);
+
+        let light2 = new PointLight('light1', new Vector3(-1.5, 3.0, -4.5), scene);
+        light2.diffuse = new Color3(0.2, 1.0, 0.2);
+        light2.specular = new Color3(1.0, 1.0, 1.0);
+        current_scene.lights.push(light2);
         
 
 
@@ -475,7 +480,7 @@ class Renderer {
         let ground_heightmap = new Texture(BASE_URL + 'heightmaps/default.png', scene);
         ground_mesh.scaling = new Vector3(20.0, 1.0, 20.0);
         ground_mesh.metadata = {
-            mat_color: new Color3(0.10, 0.65, 0.15),
+            mat_color: new Color3(0.90, 0.95, 0.80),
             mat_texture: white_texture,
             mat_specular: new Color3(0.0, 0.0, 0.0),
             mat_shininess: 1,
@@ -544,37 +549,96 @@ class Renderer {
         
                 treeVertexData.positions = treepositions;
                 treeVertexData.indices = treeIndices;
+                treeVertexData.normals = [
+                    0, 1, 0,
+                    0, 1, 0,
+                    0, 1, 0,
+                    0, 1, 0,
+                    0, 1, 0,
+                    0, 1, 0,
+                    0, 1, 0,
+                    0, 1, 0,
+                    0, 1, 0,
+                    0, 1, 0,
+                    0, 1, 0,
+                    0, 1, 0,
+                    0, 1, 0,
+                    0, 1, 0,
+                    0, 1, 0,
+                    0, 1, 0,
+                    0, 1, 0,
+                    0, 1, 0,
+                    0, 1, 0,
+                    0, 1, 0
+                ];
         
-                // let treeMesh = new Mesh("treeMesh", current_scene);
-                // treeMesh.setData(treeVertexData);
-                // scene.addMesh(treeMesh);
+                let treeMesh = new Mesh("treeMesh", scene);
+                treeVertexData.applyToMesh(treeMesh);
+                scene.addMesh(treeMesh);
+                let wood_texture = new Texture(BASE_URL + 'wood.jpg', scene);
+                treeMesh.metadata = {
+                    mat_color: new Color3(0.34, 0.97, 0.34),
+                    mat_texture: wood_texture,
+                    mat_specular: new Color3(0.8, 0.8, 0.8),
+                    mat_shininess: 16,
+                    texture_scale: new Vector2(1.0, 1.0)
+                }
+                treeMesh.material = materials['illum_' + this.shading_alg];
                 
 
 
         // Create other models
-        let sphere = CreateSphere('sphere', {segments: 32}, scene);
-        sphere.position = new Vector3(2.0, 0.3, 2.0);
-        sphere.metadata = {
+        let trunk = CreateBox("trunk", {width: 1, height: 2, depth: 1}, scene)
+        trunk.position = new Vector3(0.0, 0.0, 0.0);
+        let trunk_texture = new Texture(BASE_URL + 'trunk.jpg', scene);
+        trunk.metadata = {
             mat_color: new Color3(0.97, 0.97, 0.97),
-            mat_texture: white_texture,
+            mat_texture: trunk_texture,
             mat_specular: new Color3(0.8, 0.8, 0.8),
             mat_shininess: 16,
             texture_scale: new Vector2(1.0, 1.0)
         }
-        sphere.material = materials['illum_' + this.shading_alg];
-        current_scene.models.push(sphere);
+        trunk.material = materials['illum_' + this.shading_alg];
+        current_scene.models.push(trunk);
 
-        let box = CreateBox('box', {width: 2, height: 1, depth: 1}, scene);
-        box.position = new Vector3(-1.0, 0.5, 2.0);
-        box.metadata = {
-            mat_color: new Color3(0.75, 0.15, 0.05),
-            mat_texture: white_texture,
-            mat_specular: new Color3(0.4, 0.4, 0.4),
-            mat_shininess: 4,
+        let present1 = CreateBox("trunk", {width: 1, height: 1, depth: 1}, scene)
+        present1.position = new Vector3(2.5, 0.5, 5.0);
+        let present1_texture = new Texture(BASE_URL + 'present1.jpg', scene);
+        present1.metadata = {
+            mat_color: new Color3(0.97, 0.97, 0.97),
+            mat_texture: present1_texture,
+            mat_specular: new Color3(0.8, 0.8, 0.8),
+            mat_shininess: 16,
             texture_scale: new Vector2(1.0, 1.0)
         }
-        box.material = materials['illum_' + this.shading_alg];
-        current_scene.models.push(box);
+        present1.material = materials['illum_' + this.shading_alg];
+        current_scene.models.push(present1);
+
+        let present2 = CreateBox("trunk", {width: 1, height: 0.75, depth: 1}, scene)
+        present2.position = new Vector3(-2.0, 0.5, 5.0);
+        let present2_texture = new Texture(BASE_URL + 'present2.jpg', scene);
+        present2.metadata = {
+            mat_color: new Color3(0.97, 0.97, 0.97),
+            mat_texture: present2_texture,
+            mat_specular: new Color3(0.8, 0.8, 0.8),
+            mat_shininess: 16,
+            texture_scale: new Vector2(1.0, 1.0)
+        }
+        present2.material = materials['illum_' + this.shading_alg];
+        current_scene.models.push(present2);
+
+        let world = CreateBox("world", {width: 50, height: 50, depth: 50}, scene)
+        world.position = new Vector3(-2.0, 0.5, 5.0);
+        let world_texture = new Texture(BASE_URL + 'snow.jpg', scene);
+        world.metadata = {
+            mat_color: new Color3(0.97, 0.97, 0.97),
+            mat_texture: world_texture,
+            mat_specular: new Color3(0.8, 0.8, 0.8),
+            mat_shininess: 16,
+            texture_scale: new Vector2(1.0, 1.0)
+        }
+        world.material = materials['illum_' + this.shading_alg];
+        current_scene.models.push(world);
 
 
         // Animation function - called before each frame gets rendered
