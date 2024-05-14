@@ -48,7 +48,7 @@ void main() {
         diffuse_contrib += helper * mat_color * light_colors[i];
 
 
-        normalizedRefLightDirection = (2.0 * helper *  normalize(model_normal)) - light_dir;
+        normalizedRefLightDirection = normalize((2.0 * helper *  normalize(model_normal)) - light_dir);
         viewDirection = normalize(model_position - camera_position);
 
         float dotProduct = max(dot(normalizedRefLightDirection, viewDirection), 0.0);
